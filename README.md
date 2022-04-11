@@ -31,5 +31,5 @@ npm run start
 
 or
 
-yarn run start
+yarn start
 ```
