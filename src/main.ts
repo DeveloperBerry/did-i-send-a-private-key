@@ -71,7 +71,7 @@ async function main() {
                             console.log('Channel:', message.channel_id)
                             console.log('Content:', message.content)
                             console.log('Matched:', match[0])
-                            console.log('Url:    ',`https://discord.com/channels/${guild.id}/${message.channel_id}/${message.id}`)
+                            console.log('Url:    ', `https://discord.com/channels/${guild.id}/${message.channel_id}/${message.id}`)
                             console.log('-----------------------------')
                         }
                     } else {
@@ -93,7 +93,7 @@ async function main() {
 
         const channel = channels[c]
 
-        console.log(`Channel (${c+1}/${channels.length}):`, channel.id)
+        console.log(`Channel (${c + 1}/${channels.length}):`, channel.id)
 
         const searchResult = await searchChannels(channel.id, user.id)
 
@@ -109,7 +109,7 @@ async function main() {
                         console.log('Channel:', message.channel_id)
                         console.log('Content:', message.content)
                         console.log('Matched:', match[0])
-                        console.log('Url:    ',`https://discord.com/channels/@me/${message.channel_id}/${message.id}`)
+                        console.log('Url:    ', `https://discord.com/channels/@me/${message.channel_id}/${message.id}`)
                         console.log('-----------------------------')
                     }
                 } else {
@@ -147,34 +147,34 @@ async function searchGuild(guildId: string, authorId: string): Promise<SearchRes
     return searchEntity("guilds", guildId, authorId)
 }
 
-async function searchEntity(type: 'guilds'|'channels', entityId: string, authorId: string, offset?: number, messages?: SearchResponseMessages): Promise<SearchResponse> {
+async function searchEntity(type: 'guilds' | 'channels', entityId: string, authorId: string, offset?: number, messages?: SearchResponseMessages): Promise<SearchResponse> {
 
-    await new Promise(resolve=>setTimeout(resolve,3000))
+    await new Promise(resolve => setTimeout(resolve, 3000))
 
-    const response: SearchResponse = JSON.parse((await client.get(`${type}/${entityId}/messages/search?author_id=${authorId}${offset?`&offset=${offset}`:''}`)).data);
+    const response: SearchResponse = JSON.parse((await client.get(`${type}/${entityId}/messages/search?author_id=${authorId}${offset ? `&offset=${offset}` : ''}`)).data);
 
-    if(response.message&&response.retry_after>0){
-        console.log(response.message,`(${response.retry_after}s delay)`)
-        return await new Promise<SearchResponse>(resolve=>{
-            setTimeout(()=>{
-                resolve(searchEntity(type,entityId,authorId,offset,messages))
-            },(0.5+response.retry_after)*1000)
+    if (response.message && response.retry_after > 0) {
+        console.log(response.message, `(${response.retry_after}s delay)`)
+        return await new Promise<SearchResponse>(resolve => {
+            setTimeout(() => {
+                resolve(searchEntity(type, entityId, authorId, offset, messages))
+            }, (0.5 + response.retry_after) * 1000)
         })
-    }else if(response.analytics_id){
+    } else if (response.analytics_id) {
         const more = response.messages.length === 25;
-        if(messages){
+        if (messages) {
             response.messages = response.messages.concat(messages)
         }
-        if(more){
-            return searchEntity(type,entityId,authorId,offset?offset+25:25,response.messages)
-        }else
+        if (more) {
+            return searchEntity(type, entityId, authorId, offset ? offset + 25 : 25, response.messages)
+        } else
             return response;
-    }else{
+    } else {
         console.log(response)
-        return await new Promise<SearchResponse>(resolve=>{
-            setTimeout(()=>{
-                resolve(searchEntity(type,entityId,authorId,offset,messages))
-            },1000)
+        return await new Promise<SearchResponse>(resolve => {
+            setTimeout(() => {
+                resolve(searchEntity(type, entityId, authorId, offset, messages))
+            }, 1000)
         })
     }
 
